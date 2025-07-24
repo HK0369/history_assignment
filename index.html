@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Home Page!</h1>
+        <p>Click on the links below to simulate visiting different pages.</p>
+        <nav>
+            <ul>
+                <li><a href="index.html?page=home">Home</a></li>
+                <li><a href="index.html?page=about">About Us</a></li>
+                <li><a href="index.html?page=products">Our Products</a></li>
+                <li><a href="index.html?page=contact">Contact Us</a></li>
+                <li><a href="history.html">View History</a></li>
+            </ul>
+        </nav>
+        <div class="page-content">
+            <p>This is the content for the current page. The URL parameter <code>?page=[name]</code> is used to differentiate pages for history tracking.</p>
+            <p>Current Page: <span id="currentPageName">Home</span></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
