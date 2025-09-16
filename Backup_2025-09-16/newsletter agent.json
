@@ -1,0 +1,769 @@
+{
+  "createdAt": "2025-08-30T06:30:57.291Z",
+  "updatedAt": "2025-09-14T22:18:48.000Z",
+  "id": "7fCu0O4fM4WS5rmS",
+  "name": "newsletter agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        -32
+      ],
+      "id": "dc6f8e45-68e8-4071-a213-4ae0bc14bf3f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this agent for content writing",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "# Role:\n- You are an expert weekly newsletter content writer specializing in AI/tech topics with deep understanding of engagement optimization, storytelling, and conversion-focused copywriting.\n\n# Task:\n- Create and refine all newsletter content including headlines, introductions, AI tool descriptions, YouTube video summaries, CTAs, and transitions, ensuring high engagement and readability.\n\n# Input:\n\n{\n  \"research_data\": {\n    \"trending_tools\": [],\n    \"keywords\": [],\n    \"competitor_insights\": []\n  },\n  \"transcript\": {\n    \"video_link\": \"string\"\n    \"video_title\": \"string\",\n    \"key_points\": []\n  },\n  \"quality_feedback\": {\n    \"revision_requests\": [],\n    \"score\": \"number\"\n  },\n  \"newsletter_template\": \"string\"\n}\n\n# Constraints:\n- Newsletter must be 1000-2000 words\n- Subject line maximum 50 characters\n- Use conversational tone with YOU/YOUR language\n- Include exactly 5 trending AI tools\n- One YouTube video summary at the end of the newsletter (150-200 words)\n- Must incorporate provided SEO keywords naturally\n- Only this agent can write or modify newsletter content\n- Don't use emojis\n- Include indexing for the tools listed\n- ctaText should be dynamic for each tool and should have the tool's name\n- cta link should lead them to the tool's website\n- Introduction should have a casual tone\n\n# Output :\n\n{\n  \"newsletter\": {\n    \"subject_line\": \"string\",\n    \"header\": {\n      \"greeting\": \"<h2 class='Hello creators'>string</h2>\",\n      \"introduction\": \"<p class='introduction'>string</p>\"\n    },\n    \"ai_tools_section\": [\n      {\n        \"tool_name\": \"<h3 class='tool-name'>string</h3>\",\n        \"description\": \"<p class='tool-description'>string (about the tool)</p>\",\n        \"key_benefit\": \"<div class='key-benefit'><strong>💡 Key Benefit:</strong> string</div>\",\n         \"ctaText\": \"Try This Amazing Tool\",\n         \"cta\": \"<a href=\\\"{{TOOL_URL}}\\\" class=\\\"cta-button\\\" target=\\\"_blank\\\">{{CTA_TEXT}} →</a>\"\n      }\n    ],\n    \"youtube_summary\": {\n      \"title\": \"<h3 class='youtube-title'>🎥 string</h3>\",\n      \"summary\": \"<p class='youtube-summary'>string</p>\",\n      \"key_takeaways\": \"<ul class='key-takeaways'><li>string</li><li>string</li><li>string</li></ul>\",\n      \"watch_cta\": \"<a href='string' class='watch-cta' target='_blank'>Watch Video →</a>\"\n    },\n    \"footer\": {\n      \"closing\": \"<p class='closing'>Keep creating and see you next time!</p>\",\n      \"workshop\": \"<p class='workshop' style='margin-top: 20px;'><strong>Join our free weekend workshop on no-code automation</strong></p>\",\n      \"community_link\": \"<p style='margin-top: 15px;'><a href='https://abcd.ritz7.com' class='community-link' target='_blank'>Join Our Community</a></p>\",\n      \"feedback_request\": \"<p class='feedback-request' style='margin-top: 15px;'>Got questions or ideas for the next newsletter? Just hit reply—we'd love to hear from you!</p>\",\n      \"signature\": \"<p class='signature' style='margin-top: 20px;'><strong>— Ritz7 automations</strong></p>\"\n    }\n  }\n}\n\nNOTE: In the end do a revision to check if all of the rules have been followed"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        -336,
+        304
+      ],
+      "id": "e849c763-af4d-4307-97cb-c5be34c8b3d1",
+      "name": "writer_agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Schedule Trigger').item.json.timestamp }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -576,
+        144
+      ],
+      "id": "ba11684b-efcc-46a5-a21c-2cada1ac62bc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this agent when conducting keyword research and competitor analysis",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "# Role:\n- You are an SEO research specialist and trend analyst focused on AI/tech industry developments, with expertise in identifying viral content patterns and high-performing keywords.\n\n# Task:\n- Research and compile the top 5 trending AI tools from the past week, analyze competitor newsletters, identify high-value keywords, and gather engagement metrics for optimal newsletter performance.\n\n# Tools:\n\n- runActor1 (Run this first to extract the weekly trending AI tools)\n- getOutput (Run this second to get the dataset)\n- perplexity_ai (use this tool to provide a summary of the top 5 tools)\n\n\n# Output:\n\n{\n  \"trending_tools\": [\n    {\n      \"name\": \"string\",\n      \"category\": \"string\",\n      \"description\": \"string\",\n      \"unique_value_prop\": \"string\",\n      \"launch_date\": \"YYYY-MM-DD\",\n      \"trending_score\": \"number\",\n      \"social_proof\": {\n        \"product_hunt_votes\": \"number\",\n        \"github_stars\": \"number\",\n        \"social_mentions\": \"number\"\n      },\n      \"url\": \"string\"\n    }\n  ],\n  \"seo_keywords\": {\n    \"primary\": [],\n    \"secondary\": [],\n    \"long_tail\": []\n  },\n  \"competitor_insights\": {\n    \"top_performing_subjects\": [],\n    \"average_open_rate\": \"percentage\",\n    \"common_themes\": []\n  },\n  \"backup_tools\": []\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        304
+      ],
+      "id": "54f1adf1-1cc2-4415-953e-22cd9cc417de",
+      "name": "research_agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        496
+      ],
+      "id": "e396df96-7af5-41df-a95a-74b917b7e636",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "AYsyTrssgyAqK7ze",
+          "name": "Sam-work"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "actorId": {
+          "__rl": true,
+          "value": "faVsWy9VTSNVIhWpR",
+          "mode": "list",
+          "cachedResultName": "Youtube Transcript Scraper (pintostudio/youtube-transcript-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/faVsWy9VTSNVIhWpR/input"
+        },
+        "customBody": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Input_JSON', `Should follow the following format\n\n{ \n\"videoUrl\": \"youtube video link\" \n}`, 'json') }}",
+        "waitForFinish": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Wait_for_Finish', ``, 'boolean') }}",
+        "timeout": {},
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apifyTool",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        544
+      ],
+      "id": "d89057a3-8538-4e59-a52b-c93e076c1d75",
+      "name": "runActor",
+      "credentials": {
+        "apifyOAuth2Api": {
+          "id": "It2XcGKPaeyDaogV",
+          "name": "Sam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Dataset_ID', ``, 'string') }}",
+        "offset": {},
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apifyTool",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        544
+      ],
+      "id": "d3c479ba-27a1-4f61-bb56-619a7582e60f",
+      "name": "getTranscript",
+      "credentials": {
+        "apifyOAuth2Api": {
+          "id": "It2XcGKPaeyDaogV",
+          "name": "Sam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        928,
+        544
+      ],
+      "id": "aec8d862-ad3e-4b37-9802-f5268f34d6e3",
+      "name": "2.5-flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "AYsyTrssgyAqK7ze",
+          "name": "Sam-work"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this to extract the youtube video transcript",
+        "text": "=Use the avaialbe tools and extract the transcript of the youtube video",
+        "options": {
+          "systemMessage": "# Role:\n- You are the Transcript Extraction Specialist, an AI assistant dedicated to retrieving clean, complete YouTube transcripts.\n\n# Task:\n- Run the APIFY extraction process, retrieve the transcript, and return it in a clean, structured format.\n\n\n# Tools available:\n- google_sheet (Run this first to get the video link)\n- runActor (Use the link retrieved by google_sheet and start the transcript extraction process and store results in APIFY’s cloud).\n- getTranscript (Retrieve the stored transcript in text format).\n\n\n# Constraints:\n- Always run runActor before using getTranscript unless explicitly told the transcript already exists.\n- Remove unnecessary timestamps, filler words (“uh,” “um”), and system artifacts.\n- Do not add summaries or analysis. \n- ONLY check for spelling mistakes.\n\n# Output:\n{\n  \"transcript\": \"string\",\n  \"video_link\": \"string\" \n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        336
+      ],
+      "id": "8923ce33-73a7-4658-bc1f-9c04dd03d6f5",
+      "name": "transcript_extractor"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Use the available tools and execute the task",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# Role:\n- You are an expert workflow orchestrator specializing in newsletter production coordination. You manage the entire newsletter creation pipeline and ensure all components work together seamlessly.\n\n# Task:\n- Coordinate the creation of a weekly newsletter featuring trending AI tools in the past week and YouTube video summaries by delegating tasks to specialized agents and managing the workflow sequence.\n\n# Tools available:\n\n1. reseach_agent\n2. transcript_extractor\n3. writer_agent\n4. qa_agent\n\n# Constraints:\n- Cannot modify content directly (only Writer agent can)\n- Ensure all agents receive properly formatted JSON inputs.\n- The final_newsletter_content should only have the introduction, all 5 AI tools and it's information, conclusion, youtube video summary and footer and don't add ANYTHING extra.\n- Don't remove the html tags\n- Everytime writer_agent writes something, the quality should be checked by qa_agent\n\nWorkflow sequence:\n1. Use research_agent to research about trending AI tools\n2. Use the transcript_extractor to extract the raw transcript.\n3. Send the details of the trending AI tools and the transcript to the writer agent as input to write the newsletter\n4. Assess the quality of the newsletter\n\nNote:\n- Don't give the transcript_extractor a youtube video link as the input. It's configured to fetch the video link and extract the transcript.\n- If the qa_agent doesn't meet the score threshold then tell writer_agent to implement revision requests sent by the qa_agent\n\n# Output:\n\n{\n  \"workflow_id\": \"string\",\n  \"status\": \"completed|failed|in_progress\",\n  \"newsletter_ready\": \"true|false\",\n  \"execution_time\": \"minutes\",\n  \"subject_line\": \"string\",\n  \"final_newsletter_content\": \"string\",\n  \"errors\": []\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -32
+      ],
+      "id": "f3f0f6a1-2586-4657-a0f3-3b6c264e1427",
+      "name": "Main agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this agent when conducting final review for readability and accuracy.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "# Role:\n- You are a content quality assurance expert specializing in newsletter optimization, with expertise in engagement metrics, readability analysis, and conversion optimization.\n\n# Task:\n- Evaluate newsletter quality across multiple dimensions, provide actionable improvement suggestions, and ensure content meets performance standards before publication.\n\nInput:\n\n{\n  \"newsletter_content\": {},\n  \"performance_benchmarks\": {\n    \"min_open_rate\": \"percentage\",\n    \"min_click_rate\": \"percentage\",\n    \"readability_score\": \"number\"\n  },\n  \"brand_guidelines\": {\n    \"tone\": \"string\",\n    \"style\": \"string\",\n    \"prohibited_terms\": []\n  },\n  \"previous_performance\": {\n    \"avg_open_rate\": \"percentage\",\n    \"avg_click_rate\": \"percentage\"\n  }\n}\n\nTools:\n- E-E-A-T scoring algorithms\n- Content accuracy verification\n- Readability analysis (Flesch Reading Ease)\n- SEO compliance checking\n- Engagement prediction modeling\n- Grammar and style checking\n- Plagiarism detection\n- Fact-checking against sources\n- Performance element validation\n\nConstraints:\n- Cannot directly modify content (only writer_agent can)\n- Must provide specific, actionable feedback\n- Score threshold: minimum 85/100 for approval\n- Must check all links and CTAs\n- The footer part of the newsletter should not be changed\n\nOutput:\n\n{\n  \"quality_score\": \"number\",\n  \"assessment_status\": \"approved|needs_revision|rejected\",\n  \"detailed_scores\": {\n    \"readability\": \"number\",\n    \"engagement_potential\": \"number\",\n    \"seo_optimization\": \"number\",\n    \"brand_alignment\": \"number\",\n    \"technical_accuracy\": \"number\"\n  },\n  \"revision_requests\": [\n    {\n      \"section\": \"string\",\n      \"issue\": \"string\",\n      \"suggestion\": \"string\",\n      \"priority\": \"high|medium|low\"\n    }\n  ],\n  \"validation_checks\": {\n    \"links_valid\": true|false,\n    \"spam_score\": \"number\",\n    \"character_limits_met\": true|false\n  },\n  \"predictions\": {\n    \"estimated_open_rate\": \"percentage\",\n    \"estimated_click_rate\": \"percentage\"\n  },\n  \"approved_for_send\": true|false\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        320
+      ],
+      "id": "d098abdf-85d0-42cf-b5d8-0914f1e8f1c4",
+      "name": "qa_agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        656,
+        544
+      ],
+      "id": "9ce6fde7-c83c-4af3-9837-10ca93eb6630",
+      "name": "2.5-pro1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qGwNwJgdBxWYydRA",
+          "name": "sam-personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Schedule Trigger').item.json.timestamp }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        544
+      ],
+      "id": "d52bf8bb-4849-4dfd-a08b-905a162f300a",
+      "name": "Simple Memory 5"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Schedule Trigger').item.json.timestamp }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        544
+      ],
+      "id": "728a33b4-1737-4b2f-8e65-ce35d60ab5a4",
+      "name": "Simple Memory 2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Schedule Trigger').item.json.timestamp }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        512
+      ],
+      "id": "cdb05bf2-33ca-412c-9a11-e9e3b14a1cda",
+      "name": "Simple Memory 1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1CuLbiyCoFMbRRikF_GUpXfGkFY3mTH7zLZLfbZKoBRc",
+          "mode": "list",
+          "cachedResultName": "youtube database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CuLbiyCoFMbRRikF_GUpXfGkFY3mTH7zLZLfbZKoBRc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 571128460,
+          "mode": "list",
+          "cachedResultName": "newsletter sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CuLbiyCoFMbRRikF_GUpXfGkFY3mTH7zLZLfbZKoBRc/edit#gid=571128460"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1456,
+        544
+      ],
+      "id": "12132dd3-ae1c-4105-8ac8-0c18faeb124f",
+      "name": "google_sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdf71LKm5piveG95",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Schedule Trigger').item.json.timestamp }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        512
+      ],
+      "id": "8f8ed1d5-c3b3-4333-afbc-382caeac313a",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "model": "sonar-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "simplify": true,
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        224,
+        512
+      ],
+      "id": "22963c95-2d15-4a8a-9272-c134091abe1c",
+      "name": "perplexity_ai",
+      "credentials": {
+        "perplexityApi": {
+          "id": "edHMGBlJiiJRcohH",
+          "name": "Sam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output.subject_line }}",
+        "emailType": "html",
+        "message": "={{ $json.output.final_newsletter_content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        848,
+        -32
+      ],
+      "id": "d3c48549-4263-4d9a-8801-f47dd2991544",
+      "name": "Create a draft",
+      "webhookId": "a63af8d2-3f38-40a0-9b43-5b0980656b59",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VHqUodg0nhtvaM47",
+          "name": "Sam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"workflow_id\": \"string\",\n  \"status\": \"completed|failed|in_progress\",\n  \"newsletter_ready\": \"true|false\",\n  \"execution_time\": \"minutes\",\n  \"subject_line\": \"string\",\n  \"final_newsletter_content\": \"string\",\n  \"errors\": []\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1280,
+        192
+      ],
+      "id": "67cc37a5-046d-4a4d-aabf-f46a1ff3a393",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        512
+      ],
+      "id": "7508c6fc-263c-4dba-af28-01c74010b35f",
+      "name": "gpt-4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "CW6nOsDoAKhKGS2m",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        160
+      ],
+      "id": "9cdea941-7111-47d7-a248-effb12b8d91a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CW6nOsDoAKhKGS2m",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Dataset_ID', ``, 'string') }}",
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apifyTool",
+      "typeVersion": 1,
+      "position": [
+        464,
+        512
+      ],
+      "id": "40b11ebf-fa07-4cfb-91bb-c65b3dab5460",
+      "name": "getOutput",
+      "credentials": {
+        "apifyOAuth2Api": {
+          "id": "ifFdRDY6eLa2OQEi",
+          "name": "Sam1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "actorId": {
+          "__rl": true,
+          "value": "moJRLRc85AitArpNN",
+          "mode": "list",
+          "cachedResultName": "Web Scraper (apify/web-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/moJRLRc85AitArpNN/input"
+        },
+        "customBody": "{\n    \"breakpointLocation\": \"NONE\",\n    \"browserLog\": false,\n    \"closeCookieModals\": false,\n    \"debugLog\": false,\n    \"downloadCss\": true,\n    \"downloadMedia\": true,\n    \"excludes\": [\n        {\n            \"glob\": \"/**/*.{png,jpg,jpeg,pdf}\"\n        }\n    ],\n    \"headless\": true,\n    \"ignoreCorsAndCsp\": false,\n    \"ignoreSslErrors\": false,\n    \"injectJQuery\": true,\n    \"keepUrlFragments\": false,\n    \"pageFunction\": \"// The function accepts a single argument: the \\\"context\\\" object.\\n// For a complete list of its properties and functions,\\n// see https://apify.com/apify/web-scraper#page-function \\nasync function pageFunction(context) {\\n    // This statement works as a breakpoint when you're trying to debug your code. Works only with Run mode: DEVELOPMENT!\\n    // debugger; \\n\\n    // jQuery is handy for finding DOM elements and extracting data from them.\\n    // To use it, make sure to enable the \\\"Inject jQuery\\\" option.\\n    const $ = context.jQuery;\\n\\n    return {\\n        url: context.request.url,\\n        pageCodeBlock: $(\\\".trendai-grid-item\\\").eq(1).text()\\n    };\\n}\",\n    \"postNavigationHooks\": \"// We need to return array of (possibly async) functions here.\\n// The functions accept a single argument: the \\\"crawlingContext\\\" object.\\n[\\n    async (crawlingContext) => {\\n        // ...\\n    },\\n]\",\n    \"preNavigationHooks\": \"// We need to return array of (possibly async) functions here.\\n// The functions accept two arguments: the \\\"crawlingContext\\\" object\\n// and \\\"gotoOptions\\\".\\n[\\n    async (crawlingContext, gotoOptions) => {\\n        // ...\\n    },\\n]\\n\",\n    \"proxyConfiguration\": {\n        \"useApifyProxy\": true\n    },\n    \"respectRobotsTxtFile\": true,\n    \"runMode\": \"PRODUCTION\",\n    \"startUrls\": [\n        {\n            \"url\": \"https://www.aixploria.com/en/top-100-ai/\",\n            \"method\": \"GET\"\n        }\n    ],\n    \"useChrome\": false,\n    \"waitUntil\": [\n        \"networkidle2\"\n    ]\n}",
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apifyTool",
+      "typeVersion": 1,
+      "position": [
+        336,
+        512
+      ],
+      "id": "c5d32ef4-ebf8-40f7-82d7-1318172d3a38",
+      "name": "runActor1",
+      "credentials": {
+        "apifyOAuth2Api": {
+          "id": "ifFdRDY6eLa2OQEi",
+          "name": "Sam1"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Main agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "writer_agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "research_agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "research_agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "runActor": {
+      "ai_tool": [
+        [
+          {
+            "node": "transcript_extractor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getTranscript": {
+      "ai_tool": [
+        [
+          {
+            "node": "transcript_extractor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5-flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "transcript_extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transcript_extractor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main agent": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "qa_agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5-pro1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "qa_agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory 5": {
+      "ai_memory": [
+        [
+          {
+            "node": "transcript_extractor",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory 2": {
+      "ai_memory": [
+        [
+          {
+            "node": "qa_agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory 1": {
+      "ai_memory": [
+        [
+          {
+            "node": "writer_agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google_sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "transcript_extractor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "research_agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "perplexity_ai": {
+      "ai_tool": [
+        [
+          {
+            "node": "research_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "writer_agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Main agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "runActor1": {
+      "ai_tool": [
+        [
+          {
+            "node": "research_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getOutput": {
+      "ai_tool": [
+        [
+          {
+            "node": "research_agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b26dc6b6-2ac1-4284-9f45-ebc509931f89",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-08-30T06:30:57.295Z",
+      "updatedAt": "2025-08-30T06:30:57.295Z",
+      "role": "workflow:owner",
+      "workflowId": "7fCu0O4fM4WS5rmS",
+      "projectId": "yyDWytJdzKNmkW82"
+    }
+  ],
+  "tags": []
+}
